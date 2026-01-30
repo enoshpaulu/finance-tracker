@@ -2,73 +2,118 @@ import { useEffect, useState } from "react"
 import { supabase } from "../services/supabase"
 
 const Dashboard = () => {
-  const [income, setIncome] = useState(0)
-  const [expense, setExpense] = useState(0)
-  const [count, setCount] = useState(0)
+  const [totalAssets, setTotalAssets] = useState(0)
+  const [creditDue, setCreditDue] = useState(0)
+  const [loanDue, setLoanDue] = useState(0)
 
-  const fetchSummary = async () => {
-    const { data, error } = await supabase
+  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalExpense, setTotalExpense] = useState(0)
+
+  /* ---------- FETCH DASHBOARD DATA ---------- */
+  const fetchDashboardData = async () => {
+    // Assets
+    const { data: assets } = await supabase
+      .from("assets")
+      .select("current_value")
+
+    // Credit cards
+    const { data: cards } = await supabase
+      .from("credit_cards")
+      .select("due_amount")
+
+    // Loans
+    const { data: loans } = await supabase
+      .from("loans")
+      .select("outstanding_amount")
+
+    // Income
+    const { data: incomeTx } = await supabase
       .from("transactions")
-      .select("amount, type")
+      .select("amount")
+      .eq("type", "income")
 
-    if (error || !data) return
+    // Expenses
+    const { data: expenseTx } = await supabase
+      .from("transactions")
+      .select("amount")
+      .eq("type", "expense")
 
-    let totalIncome = 0
-    let totalExpense = 0
+    const assetTotal =
+      assets?.reduce((sum, a) => sum + a.current_value, 0) || 0
 
-    data.forEach((t) => {
-      if (t.type === "income") {
-        totalIncome += t.amount
-      } else {
-        totalExpense += t.amount
-      }
-    })
+    const cardTotal =
+      cards?.reduce((sum, c) => sum + c.due_amount, 0) || 0
 
-    setIncome(totalIncome)
-    setExpense(totalExpense)
-    setCount(data.length)
+    const loanTotal =
+      loans?.reduce((sum, l) => sum + l.outstanding_amount, 0) || 0
+
+    const incomeTotal =
+      incomeTx?.reduce((sum, t) => sum + t.amount, 0) || 0
+
+    const expenseTotal =
+      expenseTx?.reduce((sum, t) => sum + t.amount, 0) || 0
+
+    setTotalAssets(assetTotal)
+    setCreditDue(cardTotal)
+    setLoanDue(loanTotal)
+    setTotalIncome(incomeTotal)
+    setTotalExpense(expenseTotal)
   }
 
   useEffect(() => {
-    fetchSummary()
+    fetchDashboardData()
   }, [])
 
-  const balance = income - expense
+  const liabilities = creditDue + loanDue
+  const netWorth = totalAssets - liabilities
+  const savings = totalIncome - totalExpense
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-      <div className="grid grid-cols-4 gap-6">
+      {/* TOP SUMMARY */}
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-white p-4 rounded shadow">
-          <p className="text-gray-500">Income</p>
-          <p className="text-2xl font-bold text-green-600">
-            ₹{income}
+          <p className="text-sm text-gray-500">Total Income</p>
+          <p className="text-xl font-semibold text-green-600">
+            ₹{totalIncome}
           </p>
         </div>
 
         <div className="bg-white p-4 rounded shadow">
-          <p className="text-gray-500">Expense</p>
-          <p className="text-2xl font-bold text-red-600">
-            ₹{expense}
+          <p className="text-sm text-gray-500">Total Expenses</p>
+          <p className="text-xl font-semibold text-red-600">
+            ₹{totalExpense}
           </p>
         </div>
 
         <div className="bg-white p-4 rounded shadow">
-          <p className="text-gray-500">Balance</p>
+          <p className="text-sm text-gray-500">Savings</p>
           <p
-            className={`text-2xl font-bold ${
-              balance >= 0 ? "text-blue-600" : "text-red-600"
+            className={`text-xl font-semibold ${
+              savings >= 0 ? "text-green-600" : "text-red-600"
             }`}
           >
-            ₹{balance}
+            ₹{savings}
           </p>
         </div>
 
         <div className="bg-white p-4 rounded shadow">
-          <p className="text-gray-500">Transactions</p>
-          <p className="text-2xl font-bold text-gray-700">
-            {count}
+          <p className="text-sm text-gray-500">Liabilities</p>
+          <p className="text-xl font-semibold text-red-600">
+            ₹{liabilities}
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded shadow">
+          <p className="text-sm text-gray-500">Net Worth</p>
+          <p
+            className={`text-xl font-semibold ${
+              netWorth >= 0 ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            ₹{netWorth}
           </p>
         </div>
       </div>

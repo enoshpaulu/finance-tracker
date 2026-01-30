@@ -17,6 +17,11 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
+          <Link to="/banks" className="hover:text-blue-200">
+            Bank Accounts
+          </Link>
+        </li>
+        <li>
           <Link to="/transactions" className="hover:text-blue-200">
             Transactions
           </Link>
@@ -39,6 +44,11 @@ const Sidebar = () => {
         <li>
           <Link to="/assets" className="hover:text-blue-200">
             Assets
+          </Link>
+        </li>
+        <li>
+          <Link to="/analytics" className="hover:text-blue-200">
+            Analytics
           </Link>
         </li>
       </ul>

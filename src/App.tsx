@@ -8,6 +8,8 @@ import CreditCards from "./pages/CreditCards"
 import Loans from "./pages/Loans"
 import EMIs from "./pages/EMIs"
 import Assets from "./pages/Assets"
+import BankAccounts from "./pages/BankAccounts"
+import Analytics from "./pages/Analytics"
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
             <Route path="/loans" element={<Loans />} />
             <Route path="/emis" element={<EMIs />} />
             <Route path="/assets" element={<Assets />} />
+            <Route path="/banks" element={<BankAccounts/>} />
+            <Route path="/analytics" element={<Analytics />} />
           </Routes>
         </div>
       </div>

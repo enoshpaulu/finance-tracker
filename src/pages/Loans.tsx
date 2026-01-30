@@ -61,7 +61,7 @@ const Loans = () => {
         amount: loan.emi_amount,
         type: "expense",
         source: "bank",
-        from_account: "SBI Bank", // later selectable
+        bank_account_id: "5d35b8f7-d32f-47b3-9e60-1a0e4834e8d1", // later selectable
         category: "loan_emi",
         },
     ])
